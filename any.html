@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Any — KoolKatz</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <nav class="navbar">
+    <div class="nav-left"></div>
+    <div class="nav-center">
+      <a href="index.html"><img src="img/kk/logo.png" class="nav-logo" alt="KoolKatz"></a>
+    </div>
+    <div class="menu-toggle" id="menu-toggle">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="nav-right" id="nav-links">
+      <a href="index.html">INICIO</a>
+      <a href="index.html#nosotras">QUIÉNES SOMOS</a>
+      <a href="index.html#portfolios">PORTFOLIOS</a>
+      <a href="https://koolkatz.mitiendanube.com/" target="_blank" rel="noopener noreferrer">SHOP</a>
+      <a href="contacto.html">CONTACTO</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <section class="portfolio-hero">
+    <p class="subtitulo">Portfolio</p>
+    <h1>Any</h1>
+  </section>
+
+  <section class="bio">
+    <span class="bio-label">Sobre mí</span>
+    <div class="bio-texto">
+      <h2>Quién soy</h2>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+    </div>
+  </section>
+
+  <section class="proyectos">
+    <h2>Proyectos</h2>
+    <div class="filtros">
+      <button class="filtro-btn activo" data-filtro="todos">Todos</button>
+      <button class="filtro-btn" data-filtro="diseño">Diseño</button>
+      <button class="filtro-btn" data-filtro="fotografia">Fotografía</button>
+      <button class="filtro-btn" data-filtro="motion">Motion Graphics</button>
+      <button class="filtro-btn" data-filtro="audiovisual">Audiovisual</button>
+    </div>
+
+    <div class="masonry" id="grid-any">
+
+      <div class="proyecto-card" data-cat="diseño" data-cat-label="Diseño"
+           data-titulo="Proyecto 01" data-desc="Descripción del proyecto. Completar con el detalle real del trabajo realizado.">
+        <div class="proyecto-placeholder">img/any/</div>
+        <div class="proyecto-overlay"><span class="cat">Diseño</span><h3>Proyecto 01</h3></div>
+      </div>
+
+      <div class="proyecto-card" data-cat="fotografia" data-cat-label="Fotografía"
+           data-titulo="Proyecto 02" data-desc="Descripción del proyecto. Completar con el detalle real del trabajo realizado.">
+        <div class="proyecto-placeholder">img/any/</div>
+        <div class="proyecto-overlay"><span class="cat">Fotografía</span><h3>Proyecto 02</h3></div>
+      </div>
+
+      <div class="proyecto-card" data-cat="motion" data-cat-label="Motion Graphics"
+           data-titulo="Proyecto 03" data-desc="Descripción del proyecto. Completar con el detalle real del trabajo realizado.">
+        <div class="proyecto-placeholder">img/any/</div>
+        <div class="proyecto-overlay"><span class="cat">Motion Graphics</span><h3>Proyecto 03</h3></div>
+      </div>
+
+      <div class="proyecto-card" data-cat="audiovisual" data-cat-label="Audiovisual"
+           data-titulo="Proyecto 04" data-desc="Descripción del proyecto. Completar con el detalle real del trabajo realizado.">
+        <div class="proyecto-placeholder">img/any/</div>
+        <div class="proyecto-overlay"><span class="cat">Audiovisual</span><h3>Proyecto 04</h3></div>
+      </div>
+
+      <div class="proyecto-card" data-cat="diseño" data-cat-label="Diseño"
+           data-titulo="Proyecto 05" data-desc="Descripción del proyecto. Completar con el detalle real del trabajo realizado.">
+        <div class="proyecto-placeholder">img/any/</div>
+        <div class="proyecto-overlay"><span class="cat">Diseño</span><h3>Proyecto 05</h3></div>
+      </div>
+
+      <div class="proyecto-card" data-cat="fotografia" data-cat-label="Fotografía"
+           data-titulo="Proyecto 06" data-desc="Descripción del proyecto. Completar con el detalle real del trabajo realizado.">
+        <div class="proyecto-placeholder">img/any/</div>
+        <div class="proyecto-overlay"><span class="cat">Fotografía</span><h3>Proyecto 06</h3></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="herramientas">
+    <h2>Herramientas</h2>
+    <div class="tools-grid">
+      <div class="tool-item"><div class="tool-icon">Ai</div><span class="tool-name">Illustrator</span></div>
+      <div class="tool-item"><div class="tool-icon">Ps</div><span class="tool-name">Photoshop</span></div>
+      <div class="tool-item"><div class="tool-icon">Pr</div><span class="tool-name">Premiere</span></div>
+      <div class="tool-item"><div class="tool-icon">Ae</div><span class="tool-name">After Effects</span></div>
+      <div class="tool-item"><div class="tool-icon">Cv</div><span class="tool-name">Canva</span></div>
+      <div class="tool-item"><div class="tool-icon">Cc</div><span class="tool-name">CapCut</span></div>
+    </div>
+  </section>
+
+  <section class="contacto-section">
+    <h2>¿Tenés un proyecto en mente?</h2>
+    <a href="mailto:any@koolkatz.com" class="mailto-btn">Escribime</a>
+  </section>
+
+</main>
+
+<!-- PANEL LATERAL -->
+<div class="panel-overlay" id="panel">
+  <div class="panel-inner">
+    <div class="panel-imagen" id="panel-imagen">
+      <div class="panel-placeholder">img/any/</div>
+    </div>
+    <div class="panel-info">
+      <button class="panel-close" id="panel-close">✕</button>
+      <span class="panel-cat" id="panel-cat"></span>
+      <h2 class="panel-titulo" id="panel-titulo"></h2>
+      <p class="panel-desc" id="panel-desc"></p>
+      <button class="panel-btn">Ver proyecto completo ↗</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>© 2026 KoolKatz Creative Studio</p>
+    <div class="social">
+      <a href="#">Instagram</a>
+      <a href="#">Pinterest</a>
+      <a href="#">Behance</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const toggle = document.getElementById('menu-toggle');
+const navLinks = document.getElementById('nav-links');
+toggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+
+const filtros = document.querySelectorAll('.filtro-btn');
+const cards = document.querySelectorAll('#grid-any .proyecto-card');
+
+filtros.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filtros.forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo');
+    const filtro = btn.dataset.filtro;
+    cards.forEach(card => {
+      card.classList.toggle('oculto', filtro !== 'todos' && card.dataset.cat !== filtro);
+    });
+  });
+});
+
+const panel = document.getElementById('panel');
+const panelCat = document.getElementById('panel-cat');
+const panelTitulo = document.getElementById('panel-titulo');
+const panelDesc = document.getElementById('panel-desc');
+const panelImagen = document.getElementById('panel-imagen');
+const panelClose = document.getElementById('panel-close');
+
+cards.forEach(card => {
+  card.addEventListener('click', () => {
+    panelCat.textContent = card.dataset.catLabel;
+    panelTitulo.textContent = card.dataset.titulo;
+    panelDesc.textContent = card.dataset.desc;
+    const img = card.querySelector('img');
+    panelImagen.innerHTML = img
+      ? `<img src="${img.src}" alt="${card.dataset.titulo}">`
+      : `<div class="panel-placeholder">img/any/</div>`;
+    panel.classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+  });
+});
+
+panelClose.addEventListener('click', cerrar);
+panel.addEventListener('click', e => { if (e.target === panel) cerrar(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrar(); });
+
+function cerrar() {
+  panel.classList.remove('abierto');
+  document.body.style.overflow = '';
+}
+</script>
+
+</body>
+</html>
