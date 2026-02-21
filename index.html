@@ -3,105 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KoolKatz - Creative Studio</title>
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-</head>
+<title>KoolKatz — Coming Soon</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0d0d0d;
+  font-family: 'Jost', sans-serif;
+  color: #e9e3d7;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 40px;
+}
+
+.logo img {
+  height: 80px;
+  width: auto;
+}
+
+.linea {
+  width: 1px;
+  height: 60px;
+  background: rgba(213, 191, 157, 0.3);
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 48px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: #e9e3d7;
+}
+
+p {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.4;
+}
+
+.social {
+  display: flex;
+  gap: 28px;
+  margin-top: 8px;
+}
+
+.social a {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #e9e3d7;
+  text-decoration: none;
+  opacity: 0.4;
+  transition: opacity 0.3s, color 0.3s;
+}
+
+.social a:hover {
+  opacity: 1;
+  color: #d5bf9d;
+}
+
+@media (max-width: 540px) {
+  h1 { font-size: 32px; }
+}
+
+</style>
+</head>
 <body>
 
-<header>
-  <nav class="navbar">
-    <div class="nav-left"></div>
-    <div class="nav-center">
-      <a href="index.html">
-        <img src="img/kk/logo.png" class="nav-logo" alt="KoolKatz">
-      </a>
-    </div>
-    <div class="menu-toggle" id="menu-toggle">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <div class="nav-right" id="nav-links">
-      <a href="index.html">INICIO</a>
-      <a href="index.html#nosotras">QUIÉNES SOMOS</a>
-      <a href="index.html#portfolios">PORTFOLIOS</a>
-      <a href="https://koolkatz.mitiendanube.com/" target="_blank" rel="noopener noreferrer">SHOP</a>
-      <a href="contacto.html">CONTACTO</a>
-    </div>
-  </nav>
-</header>
-
-<main>
-
-  <section id="inicio" class="hero">
-    <div class="hero-content">
-      <h1>Creative Studio</h1>
-      <p>Dirección de arte, fotografía & visual storytelling</p>
-    </div>
-  </section>
-
-  <section id="nosotras" class="nosotras">
-    <div class="container">
-      <h2>NOSOTRAS</h2>
-      <p>
-        KoolKatz es un estudio creativo enfocado en dirección de arte,
-        fotografía y producción visual. Creamos universos estéticos que
-        combinan identidad, concepto y emoción.
-      </p>
-    </div>
-  </section>
-
-  <section id="portfolios" class="portfolios">
-    <a href="any.html" class="portfolio-card">
-      <img src="img/peek prueba.jpg" alt="Portfolio Any">
-      <div class="portfolio-text">
-        <h2>PORTFOLIO ANY</h2>
-      </div>
-    </a>
-    <a href="tuni.html" class="portfolio-card">
-      <img src="img/peek prueba.jpg" alt="Portfolio Tatiana">
-      <div class="portfolio-text">
-        <h2>PORTFOLIO TATIANA</h2>
-      </div>
-    </a>
-  </section>
-
-  <section id="shop" class="shop">
-    <div class="container">
-      <h2>SHOP</h2>
-      <p>Visitá nuestra tienda online</p>
-      <a href="https://koolkatz.mitiendanube.com/"
-         target="_blank"
-         rel="noopener noreferrer"
-         class="shop-btn">
-        IR A LA TIENDA
-      </a>
-    </div>
-  </section>
-
-</main>
-
-<footer class="footer">
-  <div class="container">
-    <div class="social">
-      <a href="#">Instagram</a>
-      <a href="#">Pinterest</a>
-      <a href="#">Behance</a>
-    </div>
-    <p>© 2026 KoolKatz Creative Studio</p>
+<div class="container">
+  <div class="logo">
+    <img src="img/kk/logo.png" alt="KoolKatz">
   </div>
-</footer>
-
-<script>
-const toggle = document.getElementById('menu-toggle');
-const nav = document.getElementById('nav-links');
-
-toggle.addEventListener('click', () => {
-  nav.classList.toggle('active');
-});
-</script>
+  <div class="linea"></div>
+  <h1>Algo hermoso está por llegar</h1>
+  <p>Estamos construyendo algo especial</p>
+  <div class="linea"></div>
+  <div class="social">
+    <a href="https://koolkatz.mitiendanube.com/">Visitá la tienda</a>
+  </div>
+</div>
 
 </body>
 </html>
