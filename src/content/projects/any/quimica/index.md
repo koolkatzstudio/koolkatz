@@ -7,7 +7,7 @@ categories: [audiovisual]
 media:
   - {
       type: pdf,
-      src: 'https://www.upwork.com/freelancers/~014f237a45adf53297?p=1861968177017323520',
+      src: 'https://www.upwork.com/freelancers/~014f237a45adf53297?p=1861966704002924544',
     }
 order: 3
 ---
