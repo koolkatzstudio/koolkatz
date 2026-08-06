@@ -2,13 +2,10 @@
 title: 'Balance ROOT PARTNERS S.A'
 owner: any
 categories: [visual-design]
-# No local cover provided — renders the neutral tile.
-# type pdf = the site's external "View full project ↗" link behavior.
+cover: ./cover.jpg
+coverAlt: 'Balance ROOT PARTNERS S.A — cover'
 media:
-  - {
-      type: pdf,
-      src: 'https://www.upwork.com/freelancers/~014f237a45adf53297?p=1861920950818607104',
-    }
+  - { type: video, src: '/media/balance-root-partners/1.mp4' }
 order: 1
 ---
 

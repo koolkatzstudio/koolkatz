@@ -1,17 +1,15 @@
 ---
-title: '3D Juice (Character)'
+title: '3D'
 owner: any
 categories: ['3d']
 cover: ./cover.jpg
-coverAlt: '3D Juice character — cover'
+coverAlt: '3D projects — cover'
+# 3.mp4 = Juice character; 1.mp4 and 2.mp4 = other 3D works.
 media:
   - { type: video, src: '/media/3d/1.mp4' }
   - { type: video, src: '/media/3d/2.mp4' }
-  - {
-      type: pdf,
-      src: 'https://www.upwork.com/freelancers/~014f237a45adf53297?p=1861964559526592512',
-    }
+  - { type: video, src: '/media/3d/3.mp4' }
 order: 5
 ---
 
-A personal 3D character project.
+A selection of personal 3D projects and experiments.

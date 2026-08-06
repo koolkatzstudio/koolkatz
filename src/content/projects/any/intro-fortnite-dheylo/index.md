@@ -4,10 +4,7 @@ owner: any
 categories: [motion-graphics]
 # No local cover provided — renders the neutral tile.
 media:
-  - {
-      type: pdf,
-      src: 'https://www.upwork.com/freelancers/~014f237a45adf53297?p=1861962216831647744',
-    }
+  - { type: video, src: '/media/intro-fortnite-dheylo/1.mp4' }
 order: 6
 ---
 

@@ -4,10 +4,7 @@ owner: any
 categories: [video-editing]
 # No local cover provided — renders the neutral tile.
 media:
-  - {
-      type: pdf,
-      src: 'https://www.upwork.com/freelancers/~014f237a45adf53297?p=1861923457007235072',
-    }
+  - { type: video, src: '/media/mi-nuevo-setup-leylastar/1.mp4' }
 order: 7
 ---
 

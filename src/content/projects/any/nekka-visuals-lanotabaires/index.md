@@ -2,12 +2,10 @@
 title: "Visuals for Nekka's show at LanotaBaires"
 owner: any
 categories: [motion-graphics]
-# No local cover provided — renders the neutral tile.
+cover: ./cover.jpg
+coverAlt: "Visuals for Nekka's show — cover"
 media:
-  - {
-      type: pdf,
-      src: 'https://www.upwork.com/freelancers/~014f237a45adf53297?p=1861968177017323520',
-    }
+  - { type: video, src: '/media/nekka-visuals-lanotabaires/1.mp4' }
 order: 2
 ---
 
