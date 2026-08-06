@@ -12,6 +12,9 @@ export const CATEGORY_LABELS: Record<string, string> = {
   'visual-design': 'Visual Design',
   mockups: 'Mockups',
   experimental: 'Experimental',
+  audiovisual: 'Audiovisual',
+  '3d': '3D',
+  illustration: 'Illustration',
 };
 
 export const CATEGORY_SLUGS = Object.keys(CATEGORY_LABELS);

@@ -61,7 +61,12 @@ let cards: CardData[];
 if (own.length) {
   cards = await Promise.all(
     own.map(async (p) => {
-      const cover = await getImage({ src: p.data.cover, widths: [600, 900], format: 'webp' });
+      const cover = p.data.cover
+        ? {
+            src: (await getImage({ src: p.data.cover, widths: [600, 900], format: 'webp' })).src,
+            alt: p.data.coverAlt ?? '',
+          }
+        : undefined;
       const media: MediaItem[] = await Promise.all(
         p.data.media.map(async (m) => {
           if (m.type === 'image') {
@@ -93,7 +98,7 @@ if (own.length) {
         /* About sections still holding placeholder copy are hidden */
         about: /\[PLACEHOLDER/i.test(p.body ?? '') ? '' : (p.body ?? ''),
         isPlaceholder: false,
-        cover: { src: cover.src, alt: p.data.coverAlt },
+        cover,
         media,
       };
     }),
@@ -130,6 +135,11 @@ if (own.length) {
 
 const showingPlaceholders = !own.length;
 
+/* Filters show only categories present in this owner's projects */
+const activeCategories = CATEGORY_SLUGS.filter((slug) =>
+  cards.some((c) => c.categories.includes(slug)),
+);
+
 /* Editorial span/aspect pattern (12-col desktop grid) */
 const pattern = [
   { span: 7, ar: '16 / 10' },
@@ -155,7 +165,7 @@ const dataJson = JSON.stringify(Object.fromEntries(cards.map((c) => [c.slug, c])
       <div class="filters" role="toolbar" aria-label="Filter projects by category">
         <button class="filter" data-filter="all" aria-pressed="true">All</button>
         {
-          CATEGORY_SLUGS.map((slug) => (
+          activeCategories.map((slug) => (
             <button class="filter" data-filter={slug} aria-pressed="false">
               {CATEGORY_LABELS[slug]}
             </button>

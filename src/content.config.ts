@@ -15,6 +15,9 @@ export const CATEGORIES = [
   'visual-design',
   'mockups',
   'experimental',
+  'audiovisual',
+  '3d',
+  'illustration',
 ] as const;
 
 const projects = defineCollection({
@@ -34,8 +37,9 @@ const projects = defineCollection({
       client: z.string().optional(),
       role: z.string().optional(),
       tools: z.array(z.string()).default([]),
-      cover: image(),
-      coverAlt: z.string(),
+      /** Optional: projects without a local cover render the neutral tile. */
+      cover: image().optional(),
+      coverAlt: z.string().optional(),
       media: z
         .array(
           z.discriminatedUnion('type', [

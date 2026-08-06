@@ -1,101 +1,19 @@
 ---
 /**
- * ANY — intentional holding page (per approved direction: no fake
- * portfolio). Minimal but unmistakably KoolKatz: massive name, one
- * statement, a Lacquer badge as the single expressive accent.
+ * PORTFOLIO ANY (BRIEF §3/§9): Intro · Filters · Grid · Project Overlay.
+ * Exactly the same system as /tuni — only the data changes.
  */
 import Base from '../layouts/Base.astro';
+import PortfolioIntro from '../components/PortfolioIntro.astro';
+import PortfolioGrid from '../components/PortfolioGrid.astro';
 ---
 
-<Base title="ANY" description="Any at KoolKatz Creative Studio — portfolio coming soon.">
+<Base
+  title="ANY"
+  description="Any Molina's portfolio — video editing, motion graphics and audiovisual work at KoolKatz Creative Studio."
+>
   <main>
-    <section class="holding">
-      <div class="container holding-inner">
-        <p class="kicker">Portfolio</p>
-        <h1 class="holding-name">
-          ANY<span class="accent-dot">.</span>
-        </h1>
-        <p class="holding-statement">
-          <span class="line">Redesigning portfolio.</span>
-          <span class="line line-offset">Coming soon.</span>
-        </p>
-        <span class="holding-badge" aria-hidden="true">soon</span>
-      </div>
-    </section>
+    <PortfolioIntro personKey="any" name="Any" />
+    <PortfolioGrid owner="any" />
   </main>
 </Base>
-
-<style>
-  .holding {
-    position: relative;
-    min-height: 92svh;
-    display: grid;
-    align-items: center;
-    background: var(--color-bg);
-    overflow: hidden;
-  }
-
-  /* Quiet ambient depth, kin to the loader's light pool */
-  .holding::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      ellipse 60% 45% at 38% 45%,
-      rgb(255 255 255 / 0.045) 0%,
-      transparent 70%
-    );
-    pointer-events: none;
-  }
-
-  .holding-inner {
-    position: relative;
-    display: grid;
-    gap: clamp(0.75rem, 2.5vh, 1.5rem);
-    padding-block: clamp(6rem, 16vh, 8rem);
-  }
-
-  .holding-name {
-    font-family: var(--font-impact);
-    font-weight: 800;
-    font-size: clamp(4.5rem, 3rem + 14vw, 13rem);
-    line-height: 0.95;
-    letter-spacing: 0.01em;
-  }
-
-  .accent-dot {
-    color: var(--color-accent);
-  }
-
-  .holding-statement {
-    font-family: var(--font-structure);
-    font-size: clamp(1rem, 0.8rem + 1.6vw, 1.75rem);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    display: grid;
-    gap: 0.35rem;
-    color: rgb(255 255 255 / 0.85);
-  }
-
-  .line {
-    display: block;
-  }
-
-  .line-offset {
-    margin-left: clamp(1.5rem, 6vw, 5rem);
-    color: var(--color-white);
-  }
-
-  /* Lacquer = badges/stickers (BRAND.md §4) — the one expressive accent */
-  .holding-badge {
-    justify-self: start;
-    margin-top: clamp(0.5rem, 2vh, 1.25rem);
-    font-family: var(--font-expressive);
-    font-size: clamp(1.1rem, 1rem + 1vw, 1.6rem);
-    text-transform: uppercase;
-    color: var(--color-accent);
-    border: 2px solid var(--color-accent);
-    padding: 0.35em 0.8em;
-    rotate: -4deg;
-  }
-</style>
