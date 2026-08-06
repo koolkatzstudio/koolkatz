@@ -91,23 +91,31 @@ const isActive = (href: string) => (href === '/' ? current === '/' : current.sta
     display: inline-block;
   }
 
-  /* Base layer: heavy display wordmark, always white */
+  /* Base layer (plate): wider than the script, slightly translucent
+     at rest so the background shows through; solid on hover */
   .logo-word {
     display: block;
     font-family: var(--font-impact);
     font-weight: 800;
-    font-size: clamp(1rem, 2.1vw, 1.45rem);
-    line-height: 1;
-    letter-spacing: 0.02em;
+    font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+    line-height: 1.05;
+    letter-spacing: 0.12em;
     color: var(--color-white);
+    opacity: 0.6;
+    transition: opacity var(--duration-base) var(--ease-out);
   }
 
-  /* Top layer: the script, riding across the wordmark */
+  .logo:hover .logo-word,
+  .logo:focus-visible .logo-word {
+    opacity: 1;
+  }
+
+  /* Top layer: the script, fully opaque, inside the plate's edges */
   .logo-mark {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 116%;
+    width: 92%;
     translate: -50% -54%;
     rotate: -3deg;
     pointer-events: none;
