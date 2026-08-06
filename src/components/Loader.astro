@@ -1,0 +1,175 @@
+---
+/**
+ * Loader (BRIEF §4). Bg #181818, the two cat icons star the animation:
+ * tuxedo → turn → black cat → turn → tuxedo → enter the site.
+ * Brief (~2.3s), first visit of the session only. The page loads behind it.
+ *
+ * The cats keep their ORIGINAL colors (black bodies, white details).
+ * Contrast on the dark background is solved through presentation: a soft
+ * ambient light pool behind the stage, so the black silhouettes read
+ * against it — no recoloring.
+ */
+import catTuxedo from '../assets/brand/logo-cat-tuxedo.svg?raw';
+import catBlack from '../assets/brand/logo-cat-black.svg?raw';
+---
+
+<div class="loader" id="kk-loader" aria-hidden="true">
+  <div class="stage">
+    <div class="cat" data-cat="tuxedo" set:html={catTuxedo} />
+    <div class="cat" data-cat="black" hidden set:html={catBlack} />
+  </div>
+</div>
+
+<style>
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    background: var(--color-bg);
+    transition:
+      opacity 0.45s var(--ease-in-out),
+      visibility 0.45s;
+  }
+
+  .loader.is-done {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* Never render on repeat visits (attribute set pre-paint in <head>) */
+  :global(html[data-loader='skip']) .loader {
+    display: none;
+  }
+
+  /* Safety net: without JavaScript the loader dissolves on its own */
+  :global(html:not(.js)) .loader {
+    animation: loader-autohide 0.4s 2.8s forwards;
+  }
+
+  @keyframes loader-autohide {
+    to {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+
+  .stage {
+    position: relative;
+    width: clamp(96px, 18vw, 150px);
+    animation: stage-in 0.35s var(--ease-out) both;
+  }
+
+  /* Ambient light pool — makes the black cat silhouette legible
+     without touching the artwork itself */
+  .stage::before {
+    content: '';
+    position: absolute;
+    inset: -55%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgb(255 255 255 / 0.1) 0%,
+      rgb(255 255 255 / 0.045) 45%,
+      transparent 70%
+    );
+  }
+
+  @keyframes stage-in {
+    from {
+      opacity: 0;
+      scale: 0.92;
+    }
+  }
+
+  .cat {
+    position: relative;
+  }
+
+  .cat[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  const loader = document.getElementById('kk-loader');
+  const KEY = 'kk-loader-seen';
+
+  function canStore() {
+    try {
+      sessionStorage.getItem(KEY);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  if (loader) {
+    if (canStore() && sessionStorage.getItem(KEY)) {
+      loader.remove();
+    } else {
+      const html = document.documentElement;
+      html.classList.add('kk-loading');
+
+      let ended = false;
+      const finish = () => {
+        if (ended) return;
+        ended = true;
+        if (canStore()) sessionStorage.setItem(KEY, '1');
+        loader.classList.add('is-done');
+        html.classList.remove('kk-loading');
+        setTimeout(() => loader.remove(), 500);
+      };
+
+      // Failsafe: animations pause in hidden/background tabs — the loader
+      // must never be able to block the site, whatever happens.
+      setTimeout(finish, 4500);
+
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduced) {
+        // Static tuxedo, brief pause, dissolve — no turns.
+        setTimeout(finish, 700);
+      } else {
+        const stage = loader.querySelector<HTMLElement>('.stage')!;
+        const tux = loader.querySelector<HTMLElement>('[data-cat="tuxedo"]')!;
+        const black = loader.querySelector<HTMLElement>('[data-cat="black"]')!;
+        const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+        // A "turn": the stage squeezes shut, the cat swaps, it opens again.
+        const turnTo = async (show: HTMLElement, hide: HTMLElement) => {
+          await stage.animate(
+            { transform: ['scaleX(1)', 'scaleX(0)'] },
+            { duration: 170, easing: 'cubic-bezier(0.55, 0, 0.7, 0.3)', fill: 'forwards' },
+          ).finished;
+          hide.hidden = true;
+          show.hidden = false;
+          await stage.animate(
+            { transform: ['scaleX(0)', 'scaleX(1)'] },
+            { duration: 170, easing: 'cubic-bezier(0.3, 0.7, 0.45, 1)', fill: 'forwards' },
+          ).finished;
+        };
+
+        const run = async () => {
+          if (ended) return;
+          await wait(520); // tuxedo present
+          await turnTo(black, tux);
+          await wait(430); // black cat present
+          await turnTo(tux, black);
+          await wait(400); // tuxedo again → enter
+          finish();
+        };
+
+        // Start the show only when the page is actually visible, so the
+        // sequence isn't silently consumed in a background tab.
+        if (document.visibilityState === 'visible') {
+          run();
+        } else {
+          document.addEventListener('visibilitychange', () => run(), { once: true });
+        }
+      }
+    }
+  }
+</script>

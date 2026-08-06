@@ -1,0 +1,105 @@
+---
+/**
+ * Footer. Quiet close: script wordmark, nav, copyright.
+ * (Social links intentionally absent — none provided.)
+ */
+import logoScript from '../assets/brand/logo-script.svg?raw';
+import { site } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <a href="/" class="footer-logo" aria-label="KoolKatz — Home">
+      <span class="logo-mark" set:html={logoScript} />
+    </a>
+
+    <nav aria-label="Footer">
+      <ul>
+        {
+          site.nav.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <p class="copyright">© {year} KoolKatz Creative Studio</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--color-black);
+    padding-block: clamp(2.5rem, 8vh, 4.5rem);
+  }
+
+  .footer-grid {
+    display: grid;
+    gap: 1.25rem;
+    align-items: center;
+  }
+
+  .footer-logo {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    justify-self: start;
+  }
+
+  .logo-mark :global(svg) {
+    width: clamp(5.5rem, 9vw, 7rem);
+    height: auto;
+  }
+
+  .logo-mark :global(svg path) {
+    fill: var(--color-white);
+  }
+
+  .footer nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin-left: -0.75rem; /* re-aligns first link's visual edge */
+  }
+
+  .footer nav a {
+    font-family: var(--font-structure);
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-decoration: none;
+    opacity: 0.8;
+    /* ≥44px touch target while keeping the quiet visual size */
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 0.75rem;
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      color var(--duration-base) var(--ease-out);
+  }
+
+  .footer nav a:hover {
+    opacity: 1;
+    color: var(--color-accent);
+  }
+
+  .copyright {
+    font-size: var(--text-sm);
+    opacity: 0.5;
+  }
+
+  @media (min-width: 48rem) {
+    .footer-grid {
+      grid-template-columns: auto 1fr auto;
+    }
+    .footer nav ul {
+      justify-content: center;
+    }
+  }
+</style>

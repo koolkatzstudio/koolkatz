@@ -1,0 +1,363 @@
+---
+/**
+ * Header / Navigation (BRIEF §5). Clean, lets the content lead.
+ * Desktop: script wordmark + inline nav (Mattone).
+ * Mobile (≤48rem): hamburger button → full-screen menu over #060606,
+ * large Mattone type, pastel pink accent, explicit ✕ close, scroll
+ * lock, focus trap and Escape to close.
+ */
+import logoScript from '../assets/brand/logo-script.svg?raw';
+import { site } from '../data/site';
+
+const current = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => (href === '/' ? current === '/' : current.startsWith(href));
+---
+
+<header class="header">
+  <a href="/" class="logo" aria-label="KoolKatz — Home">
+    <!-- Layered lockup (after the brand's header reference): bold
+         wordmark as base, script overlaid on top — one Home link -->
+    <span class="logo-lockup">
+      <span class="logo-word" aria-hidden="true">KOOLKATZ</span>
+      <span class="logo-mark" set:html={logoScript} />
+    </span>
+  </a>
+
+  <nav class="nav-desktop" aria-label="Main">
+    <ul>
+      {
+        site.nav.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <button
+    class="menu-btn"
+    id="kk-menu-btn"
+    aria-expanded="false"
+    aria-controls="kk-menu"
+    aria-label="Open menu"
+  >
+    <span class="burger" aria-hidden="true"><span></span><span></span><span></span></span>
+  </button>
+</header>
+
+<div class="menu" id="kk-menu" hidden>
+  <button class="menu-close" id="kk-menu-close" aria-label="Close menu">
+    <span class="close-x" aria-hidden="true"></span>
+  </button>
+
+  <nav aria-label="Main menu">
+    <ul>
+      {
+        site.nav.map((item, i) => (
+          <li style={`--i: ${i}`}>
+            <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+              <span class="menu-index">0{i + 1}</span>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</div>
+
+<style>
+  .header {
+    position: absolute;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: clamp(0.75rem, 2.5vw, 1.5rem) clamp(1rem, 4vw, 3.5rem);
+  }
+
+  .logo {
+    display: block;
+    padding: 0.5rem 0; /* comfortable touch target without visual bulk */
+  }
+
+  .logo-lockup {
+    position: relative;
+    display: inline-block;
+  }
+
+  /* Base layer: heavy display wordmark, always white */
+  .logo-word {
+    display: block;
+    font-family: var(--font-impact);
+    font-weight: 800;
+    font-size: clamp(1rem, 2.1vw, 1.45rem);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: var(--color-white);
+  }
+
+  /* Top layer: the script, riding across the wordmark */
+  .logo-mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 116%;
+    translate: -50% -54%;
+    rotate: -3deg;
+    pointer-events: none;
+  }
+
+  .logo-mark :global(svg) {
+    width: 100%;
+    height: auto;
+    /* lets the script read against the wordmark underneath */
+    filter: drop-shadow(0 0 6px rgb(6 6 6 / 0.55));
+  }
+
+  .logo-mark :global(svg path) {
+    fill: var(--color-white);
+    transition: fill var(--duration-base) var(--ease-out);
+  }
+
+  .logo:hover .logo-mark :global(svg path),
+  .logo:focus-visible .logo-mark :global(svg path) {
+    fill: var(--color-accent);
+  }
+
+  /* ---- Desktop nav ---- */
+  .nav-desktop ul {
+    display: flex;
+    gap: clamp(0.5rem, 2vw, 1.75rem);
+    list-style: none;
+    padding: 0;
+  }
+
+  .nav-desktop a {
+    font-family: var(--font-structure);
+    font-size: 0.8125rem;
+    letter-spacing: 0.22em;
+    text-decoration: none;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px; /* touch-friendly on tablets that show desktop nav */
+    padding-inline: 0.5rem;
+  }
+
+  .nav-desktop a::after {
+    content: '';
+    position: absolute;
+    inset: auto 0.5rem 0.6rem 0.5rem;
+    height: 1px;
+    background: var(--color-accent);
+    scale: 0 1;
+    transform-origin: left;
+    transition: scale var(--duration-base) var(--ease-out);
+  }
+
+  .nav-desktop a:hover::after,
+  .nav-desktop a[aria-current='page']::after {
+    scale: 1 1;
+  }
+
+  /* ---- Hamburger ---- */
+  .menu-btn {
+    display: none;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    margin-right: -8px; /* optical alignment with page edge */
+  }
+
+  .burger {
+    display: grid;
+    gap: 6px;
+    width: 24px;
+  }
+
+  .burger span {
+    height: 2px;
+    background: var(--color-white);
+    transition: background var(--duration-base) var(--ease-out);
+  }
+
+  .menu-btn:active .burger span {
+    background: var(--color-accent);
+  }
+
+  /* ---- Full-screen mobile menu ---- */
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: var(--color-black);
+    display: grid;
+    align-content: center;
+    padding: clamp(1.25rem, 6vw, 3rem);
+  }
+
+  /* Author styles must not defeat the hidden attribute */
+  .menu[hidden] {
+    display: none;
+  }
+
+  .menu-close {
+    position: absolute;
+    top: clamp(0.75rem, 2.5vw, 1.5rem);
+    right: clamp(1rem, 4vw, 3.5rem);
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+  }
+
+  .close-x {
+    position: relative;
+    width: 24px;
+    height: 24px;
+  }
+
+  .close-x::before,
+  .close-x::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--color-white);
+    transition: background var(--duration-base) var(--ease-out);
+  }
+
+  .close-x::before {
+    rotate: 45deg;
+  }
+
+  .close-x::after {
+    rotate: -45deg;
+  }
+
+  .menu-close:hover .close-x::before,
+  .menu-close:hover .close-x::after,
+  .menu-close:active .close-x::before,
+  .menu-close:active .close-x::after {
+    background: var(--color-accent);
+  }
+
+  .menu ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: clamp(0.25rem, 1.5vh, 0.75rem);
+  }
+
+  .menu a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    font-family: var(--font-structure);
+    font-size: clamp(1.9rem, 8vw, 3rem);
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    padding-block: 0.5rem; /* ≥44px tap area on top of the large type */
+    transition: color var(--duration-base) var(--ease-out);
+  }
+
+  .menu a[aria-current='page'],
+  .menu a:hover,
+  .menu a:active {
+    color: var(--color-accent);
+  }
+
+  .menu-index {
+    font-family: var(--font-base);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    opacity: 0.85;
+  }
+
+  .menu:not([hidden]) li {
+    animation: menu-item-in 0.4s var(--ease-out) both;
+    animation-delay: calc(var(--i) * 60ms);
+  }
+
+  @keyframes menu-item-in {
+    from {
+      opacity: 0;
+      translate: 0 0.9rem;
+    }
+  }
+
+  :global(html.kk-menu-open) {
+    overflow: hidden;
+  }
+
+  @media (max-width: 48rem) {
+    .nav-desktop {
+      display: none;
+    }
+    .menu-btn {
+      display: grid;
+    }
+  }
+
+  @media (min-width: 48.01rem) {
+    .menu {
+      display: none !important;
+    }
+    .menu-btn {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  const btn = document.getElementById('kk-menu-btn');
+  const menu = document.getElementById('kk-menu');
+  const closeBtn = document.getElementById('kk-menu-close');
+
+  if (btn && menu && closeBtn) {
+    const setOpen = (open: boolean) => {
+      menu.hidden = !open;
+      btn.setAttribute('aria-expanded', String(open));
+      document.documentElement.classList.toggle('kk-menu-open', open);
+      if (open) {
+        closeBtn.focus();
+      } else {
+        btn.focus();
+      }
+    };
+
+    btn.addEventListener('click', () => setOpen(true));
+    closeBtn.addEventListener('click', () => setOpen(false));
+
+    menu.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) setOpen(false);
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !menu.hidden) setOpen(false);
+    });
+
+    // Focus trap while the menu is open
+    menu.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      const focusables = menu.querySelectorAll<HTMLElement>('a[href], button');
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        last.focus();
+        e.preventDefault();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        first.focus();
+        e.preventDefault();
+      }
+    });
+  }
+</script>

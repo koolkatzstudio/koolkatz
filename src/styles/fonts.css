@@ -1,0 +1,77 @@
+/* ============================================================
+   KOOLKATZ — @font-face declarations
+   Audited 2026-08-05: all files are valid woff2, full basic-latin
+   + accented glyph coverage, verified with fontkit.
+
+   NOTE — Poppins: only the BOLD (700) cut was provided. Poppins is
+   the base font for ~70% of the text (BRAND.md §4), so the Regular
+   (400) file is still PENDING — see PENDING_ASSETS.md. Until it
+   arrives, body copy at weight 400 will render using the 700 file.
+   When poppins-regular.woff2 lands, add the commented block below.
+
+   NOTE — "Laquer" in BRAND.md is spelled "Lacquer" in the actual
+   font metadata; CSS uses the real family name 'Lacquer'.
+   ============================================================ */
+
+/* Poppins — base (~70% of text). PENDING: regular (400) cut. */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/poppins-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+/*
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/poppins-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+/* Mattone — structure: headings, nav, categories */
+@font-face {
+  font-family: 'Mattone';
+  src: url('/fonts/mattone-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Agrandir Grand — impact: hero titles, statements (Heavy cut, 800) */
+@font-face {
+  font-family: 'Agrandir Grand';
+  src: url('/fonts/agrandir-grand-heavy.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* TC Chaddlewood — personality: quotes, call-outs */
+@font-face {
+  font-family: 'TC Chaddlewood';
+  src: url('/fonts/tc-chaddlewood-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Lacquer — expression: badges, labels, stickers. Never body text. */
+@font-face {
+  font-family: 'Lacquer';
+  src: url('/fonts/lacquer-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Sprite Graffiti — intervention: doodles, graphic overlays only */
+@font-face {
+  font-family: 'Sprite Graffiti';
+  src: url('/fonts/sprite-graffiti.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

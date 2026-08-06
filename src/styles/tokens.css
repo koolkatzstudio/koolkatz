@@ -1,0 +1,67 @@
+/* ============================================================
+   KOOLKATZ — Design tokens
+   Single source of truth, mirroring BRAND.md.
+   Change values here, never hardcode them in components.
+   ============================================================ */
+
+:root {
+  /* ---- Color system (BRAND.md §3) ---- */
+  --color-bg: #181818;          /* main background / dominant surface */
+  --color-black: #060606;       /* contrast, secondary backgrounds, depth */
+  --color-white: #ffffff;       /* type, logos, high contrast */
+
+  --color-accent: #f597ac;      /* pastel pink — primary accent, interaction */
+  --color-accent-cyan: #4cffe9; /* secondary — contrast, small details */
+  --color-accent-pink: #ff5e9d; /* secondary — high intensity, punctual use */
+
+  /* ---- Typography (BRAND.md §4) ----
+     Local woff2 files loaded in fonts.css (audited 2026-08-05).
+     "Laquer" (BRAND.md) = 'Lacquer' (real font family name). */
+  --font-base: 'Poppins', system-ui, sans-serif;            /* body, ~70% of text */
+  --font-structure: 'Mattone', 'Poppins', sans-serif;       /* headings, nav, categories */
+  --font-impact: 'Agrandir Grand', 'Mattone', sans-serif;   /* hero titles, statements */
+  --font-personality: 'TC Chaddlewood', 'Poppins', serif;   /* quotes, call-outs */
+  --font-expressive: 'Lacquer', 'Poppins', sans-serif;      /* badges, labels, stickers */
+  --font-intervention: 'Sprite Graffiti', cursive;          /* graphic interventions only */
+
+  /* ---- Type scale (fluid) ---- */
+  --text-sm: clamp(0.8125rem, 0.75rem + 0.25vw, 0.9375rem);
+  --text-base: clamp(0.9375rem, 0.875rem + 0.3vw, 1.0625rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1.5vw, 2.5rem);
+  --text-display: clamp(2.5rem, 1.5rem + 6vw, 7rem);        /* hero / impact */
+
+  /* ---- Spacing (generous air — BRAND.md §6) ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.5rem;
+  --space-6: 4rem;
+  --space-7: 6.5rem;
+  --space-8: 10rem;
+
+  /* ---- Image treatments (BRAND.md §5/§7, BRIEF §8/§10) ----
+     teaser: Home collage — blur is NEVER removed on the Home.
+     grid:   portfolio grids — light blur, lifted on hover/scroll-reveal. */
+  --treatment-teaser: grayscale(1) blur(6px);
+  --treatment-teaser-hover: grayscale(0) blur(6px);
+  --treatment-grid: grayscale(1) blur(2px);
+  --treatment-revealed: none;
+
+  /* ---- Motion (BRAND.md §8: agile, not accelerated; no bounces) ---- */
+  --duration-fast: 180ms;
+  --duration-base: 250ms;
+  --duration-slow: 450ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --scale-hover: 1.02;          /* small scale change on grid hover */
+
+  /* ---- Texture (BRIEF §6: wall texture at ~8–10% presence) ---- */
+  --texture-opacity: 0.09;
+
+  /* ---- Layout ---- */
+  --content-max: 90rem;
+  --overlay-size-desktop: 88vw; /* project overlay: 85–90% of viewport */
+}

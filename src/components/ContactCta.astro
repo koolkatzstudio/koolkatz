@@ -1,0 +1,80 @@
+---
+/**
+ * Contact CTA (BRIEF §3 — Home). One big, warm invitation to talk,
+ * pointing to the Contact page. Keeps the positive "let's create"
+ * energy (BRAND.md §7).
+ * COPY NOTE: placeholder wording — flagged in PENDING_ASSETS.md.
+ */
+---
+
+<section class="cta">
+  <div class="container" data-reveal>
+    <p class="kicker">Got a project in mind?</p>
+    <a class="cta-link" href="/contact">
+      Let's talk
+      <span class="arrow" aria-hidden="true">↗</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .cta {
+    background: var(--color-bg);
+    padding-block: clamp(5rem, 16vh, 10rem);
+  }
+
+  .cta .container {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+
+  .cta-link {
+    font-family: var(--font-impact);
+    font-weight: 800;
+    font-size: clamp(2.75rem, 1.5rem + 7vw, 6.5rem);
+    line-height: 1;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.15em;
+    position: relative;
+  }
+
+  .arrow {
+    font-size: 0.55em;
+    color: var(--color-accent);
+    transition: translate var(--duration-base) var(--ease-out);
+  }
+
+  .cta-link::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -0.08em 0;
+    height: 0.045em;
+    background: var(--color-accent);
+    scale: 0 1;
+    transform-origin: left;
+    transition: scale 0.45s var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .cta-link:hover::after {
+      scale: 1 1;
+    }
+    .cta-link:hover .arrow {
+      translate: 0.12em -0.12em;
+    }
+  }
+
+  /* Mobile: tighter block spacing and a size that leaves air at the edge */
+  @media (max-width: 48rem) {
+    .cta {
+      padding-block: clamp(4rem, 12vh, 6rem);
+    }
+    .cta-link {
+      font-size: clamp(2.35rem, 1.2rem + 6.8vw, 4rem);
+    }
+  }
+</style>

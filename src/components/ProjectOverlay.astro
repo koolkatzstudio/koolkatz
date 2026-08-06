@@ -1,0 +1,457 @@
+---
+/**
+ * Project overlay (BRIEF §11). Native <dialog>: ~88% of the viewport on
+ * desktop, effectively full-screen on mobile. Deep links via #hash +
+ * pushState so the phone's back button closes it. Focus trap and Esc
+ * come free with showModal().
+ *
+ * Inside the overlay the project keeps its ORIGINAL identity: media is
+ * rendered with no grayscale/blur — KoolKatz frames the work, it never
+ * restyles it. Info: name, category, year, type, client, role, tools,
+ * about (BRIEF §11).
+ */
+---
+
+<dialog class="overlay" id="kk-overlay" aria-labelledby="kk-overlay-title">
+  <button class="ov-close" id="kk-overlay-close" aria-label="Close project">
+    <span class="close-x" aria-hidden="true"></span>
+  </button>
+
+  <div class="ov-scroll">
+    <div class="ov-layout">
+      <aside class="ov-info">
+        <p class="ov-kicker" id="kk-overlay-kicker"></p>
+        <h2 class="ov-title" id="kk-overlay-title"></h2>
+        <dl class="ov-meta" id="kk-overlay-meta"></dl>
+        <div class="ov-about" id="kk-overlay-about"></div>
+      </aside>
+      <div class="ov-media" id="kk-overlay-media"></div>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .overlay {
+    /* Neutral frame: the project's own identity leads inside */
+    width: min(88vw, 100rem);
+    height: 88dvh;
+    border: none;
+    padding: 0;
+    background: var(--color-black);
+    color: var(--color-white);
+  }
+
+  .overlay::backdrop {
+    background: rgb(6 6 6 / 0.75);
+    backdrop-filter: blur(4px);
+  }
+
+  .ov-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    background: rgb(6 6 6 / 0.7);
+    border-radius: 50%;
+  }
+
+  .close-x {
+    position: relative;
+    width: 20px;
+    height: 20px;
+  }
+
+  .close-x::before,
+  .close-x::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--color-white);
+    transition: background var(--duration-base) var(--ease-out);
+  }
+
+  .close-x::before {
+    rotate: 45deg;
+  }
+  .close-x::after {
+    rotate: -45deg;
+  }
+
+  .ov-close:hover .close-x::before,
+  .ov-close:hover .close-x::after {
+    background: var(--color-accent);
+  }
+
+  .ov-scroll {
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .ov-layout {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    padding: clamp(1.25rem, 4vw, 3rem);
+  }
+
+  .ov-kicker {
+    font-family: var(--font-structure);
+    font-size: 0.6875rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 0.6rem;
+  }
+
+  .ov-title {
+    font-family: var(--font-impact);
+    font-weight: 800;
+    font-size: clamp(1.75rem, 1.2rem + 2.5vw, 3.25rem);
+    line-height: 1.05;
+    text-transform: uppercase;
+    margin-bottom: clamp(1.25rem, 3vh, 2rem);
+  }
+
+  .ov-meta {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.45rem 1.25rem;
+    margin: 0 0 clamp(1.25rem, 3vh, 2rem);
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+    padding-top: 1rem;
+  }
+
+  .ov-meta :global(dt) {
+    font-family: var(--font-structure);
+    font-size: 0.625rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.5);
+    padding-top: 0.15em;
+  }
+
+  .ov-meta :global(dd) {
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+
+  .ov-about {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: rgb(255 255 255 / 0.85);
+    max-width: 38rem;
+  }
+
+  .ov-about :global(p + p) {
+    margin-top: 0.75em;
+  }
+
+  /* Media: the project as it really is — no KoolKatz treatment */
+  .ov-media {
+    display: grid;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    align-content: start;
+  }
+
+  .ov-media :global(img),
+  .ov-media :global(video) {
+    width: 100%;
+    height: auto;
+  }
+
+  .ov-media :global(iframe) {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+  }
+
+  /* YouTube Shorts keep their vertical 9:16 format */
+  .ov-media :global(.ov-yt-vertical) {
+    justify-self: start;
+    width: min(100%, 24rem);
+  }
+
+  .ov-media :global(.ov-yt-vertical iframe) {
+    aspect-ratio: 9 / 16;
+    height: auto;
+  }
+
+  .ov-media :global(.ov-ph) {
+    aspect-ratio: 16 / 9;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(155deg, #1f1f1f, #161616);
+    font-family: var(--font-structure);
+    font-size: 0.625rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.3);
+    border: 1px dashed rgb(255 255 255 / 0.18);
+  }
+
+  .ov-media :global(figcaption) {
+    font-size: 0.75rem;
+    color: rgb(255 255 255 / 0.5);
+    margin-top: 0.4rem;
+  }
+
+  /* PDFs: plain designed link, no embedded viewer */
+  .ov-media :global(.ov-pdf) {
+    justify-self: start;
+    font-family: var(--font-structure);
+    font-size: 0.8125rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--color-white);
+    border: 1px solid rgb(255 255 255 / 0.35);
+    padding: 0.8rem 1.4rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition:
+      border-color var(--duration-base) var(--ease-out),
+      color var(--duration-base) var(--ease-out);
+  }
+
+  .ov-media :global(.ov-pdf:hover) {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .ov-media :global(.ov-pdf-arrow) {
+    color: var(--color-accent);
+  }
+
+  /* Desktop: sticky info column beside scrolling media */
+  @media (min-width: 60rem) {
+    .ov-layout {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+      align-items: start;
+    }
+    .ov-info {
+      position: sticky;
+      top: 0;
+    }
+  }
+
+  /* Mobile: practically full-screen, vertical content (BRIEF §15) */
+  @media (max-width: 48rem) {
+    .overlay {
+      width: 100vw;
+      height: 100dvh;
+      max-width: 100vw;
+      max-height: 100dvh;
+      margin: 0;
+    }
+  }
+
+  :global(html.kk-overlay-open) {
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  import { CATEGORY_LABELS } from '../data/categories';
+
+  const dialog = document.getElementById('kk-overlay') as HTMLDialogElement | null;
+  const dataEl = document.getElementById('kk-projects-data');
+
+  if (dialog && dataEl) {
+    const projects = JSON.parse(dataEl.textContent ?? '{}');
+    const kicker = document.getElementById('kk-overlay-kicker')!;
+    const title = document.getElementById('kk-overlay-title')!;
+    const meta = document.getElementById('kk-overlay-meta')!;
+    const about = document.getElementById('kk-overlay-about')!;
+    const mediaBox = document.getElementById('kk-overlay-media')!;
+    const closeBtn = document.getElementById('kk-overlay-close')!;
+
+    let openedFromDeepLink = false;
+    let cleaned = true; // nothing open initially
+
+    /* Cleanup runs explicitly from every close path (button, Esc,
+       backdrop, back button) instead of relying on the dialog 'close'
+       event, which is not guaranteed to fire in every environment.
+       Idempotent via the `cleaned` flag. */
+    function cleanup(viaPop: boolean) {
+      if (cleaned) return;
+      cleaned = true;
+      document.documentElement.classList.remove('kk-overlay-open');
+      if (!viaPop) {
+        if (openedFromDeepLink) {
+          // Direct deep link: don't navigate away from the page on close
+          history.replaceState(null, '', location.pathname + location.search);
+        } else if (history.state?.kkProject) {
+          history.back();
+        }
+      }
+      openedFromDeepLink = false;
+    }
+
+    const metaRow = (label: string, value: string) => {
+      const dt = document.createElement('dt');
+      dt.textContent = label;
+      const dd = document.createElement('dd');
+      dd.textContent = value;
+      meta.append(dt, dd);
+    };
+
+    const KIND_LABELS: Record<string, string> = {
+      client: 'Client project',
+      personal: 'Personal project',
+      academic: 'Academic project',
+    };
+
+    function fill(p: any) {
+      kicker.textContent = p.isPlaceholder ? 'Placeholder — layout testing' : 'Project';
+      title.textContent = p.title;
+
+      meta.replaceChildren();
+      metaRow('Category', p.categories.map((c: string) => CATEGORY_LABELS[c] ?? c).join(' · '));
+      /* Optional metadata renders only when it exists — never invented */
+      if (p.year != null) metaRow('Year', String(p.year));
+      if (p.kind) metaRow('Type', KIND_LABELS[p.kind] ?? p.kind);
+      if (p.client) metaRow('Client', p.client);
+      if (p.role) metaRow('Role', p.role);
+      if (p.tools?.length) metaRow('Tools', p.tools.join(' · '));
+
+      about.replaceChildren();
+      for (const para of String(p.about ?? '').split(/\n\s*\n/)) {
+        if (!para.trim()) continue;
+        const el = document.createElement('p');
+        el.textContent = para.trim();
+        about.append(el);
+      }
+
+      mediaBox.replaceChildren();
+      for (const m of p.media ?? []) {
+        if (m.type === 'image') {
+          const img = document.createElement('img');
+          img.src = m.src;
+          img.alt = m.alt ?? '';
+          img.loading = 'lazy';
+          mediaBox.append(img);
+        } else if (m.type === 'video') {
+          const isFile = /\.(mp4|webm|mov)(\?.*)?$/i.test(m.src) || m.src.startsWith('/');
+          const fig = document.createElement('figure');
+          if (isFile) {
+            const video = document.createElement('video');
+            video.src = m.src;
+            video.controls = true;
+            video.playsInline = true;
+            video.preload = 'metadata';
+            if (m.poster) video.poster = m.poster;
+            fig.append(video);
+          } else {
+            const frame = document.createElement('iframe');
+            frame.src = m.src;
+            frame.allowFullscreen = true;
+            frame.loading = 'lazy';
+            frame.title = m.caption || p.title;
+            fig.append(frame);
+          }
+          if (m.caption) {
+            const cap = document.createElement('figcaption');
+            cap.textContent = m.caption;
+            fig.append(cap);
+          }
+          mediaBox.append(fig);
+        } else if (m.type === 'youtube') {
+          const fig = document.createElement('figure');
+          if (m.vertical) fig.className = 'ov-yt-vertical';
+          const frame = document.createElement('iframe');
+          frame.src = `https://www.youtube-nocookie.com/embed/${m.id}`;
+          frame.allow =
+            'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+          frame.allowFullscreen = true;
+          frame.loading = 'lazy';
+          frame.title = m.caption || p.title;
+          fig.append(frame);
+          if (m.caption) {
+            const cap = document.createElement('figcaption');
+            cap.textContent = m.caption;
+            fig.append(cap);
+          }
+          mediaBox.append(fig);
+        } else if (m.type === 'pdf') {
+          const link = document.createElement('a');
+          link.className = 'ov-pdf';
+          link.href = m.src;
+          link.target = '_blank';
+          link.rel = 'noopener';
+          link.textContent = m.label ?? 'View full project';
+          const arrow = document.createElement('span');
+          arrow.className = 'ov-pdf-arrow';
+          arrow.setAttribute('aria-hidden', 'true');
+          arrow.textContent = ' ↗';
+          link.append(arrow);
+          mediaBox.append(link);
+        } else {
+          const ph = document.createElement('div');
+          ph.className = 'ov-ph';
+          ph.textContent = 'Placeholder media';
+          mediaBox.append(ph);
+        }
+      }
+    }
+
+    function open(slug: string, viaDeepLink = false) {
+      const p = projects[slug];
+      if (!p || dialog.open) return;
+      fill(p);
+      dialog.showModal();
+      dialog.querySelector('.ov-scroll')!.scrollTop = 0;
+      document.documentElement.classList.add('kk-overlay-open');
+      openedFromDeepLink = viaDeepLink;
+      cleaned = false;
+      if (viaDeepLink) {
+        history.replaceState({ kkProject: slug }, '', `#${encodeURIComponent(slug)}`);
+      } else {
+        history.pushState({ kkProject: slug }, '', `#${encodeURIComponent(slug)}`);
+      }
+    }
+
+    // Open on card click (delegated so filtering never detaches handlers)
+    document.addEventListener('click', (e) => {
+      const card = (e.target as HTMLElement).closest<HTMLElement>('[data-project]');
+      if (card?.dataset.project) open(card.dataset.project);
+    });
+
+    closeBtn.addEventListener('click', () => {
+      dialog.close();
+      cleanup(false);
+    });
+
+    // Click on the backdrop (outside the content) closes too
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) {
+        dialog.close();
+        cleanup(false);
+      }
+    });
+
+    // Esc key: 'cancel' fires before the dialog closes itself
+    dialog.addEventListener('cancel', () => cleanup(false));
+
+    // Spec-compliant backup path (no-op when cleanup already ran)
+    dialog.addEventListener('close', () => cleanup(false));
+
+    // Back/forward buttons: back closes the overlay (key on mobile)
+    window.addEventListener('popstate', () => {
+      if (dialog.open) dialog.close();
+      cleanup(true);
+    });
+
+    // Deep link: /tuni#slug opens the overlay directly
+    const hash = decodeURIComponent(location.hash.slice(1));
+    if (hash && projects[hash]) open(hash, true);
+  }
+</script>

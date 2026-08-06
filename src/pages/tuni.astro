@@ -1,0 +1,19 @@
+---
+/**
+ * PORTFOLIO TUNI (BRIEF §3/§9): Intro · Filters · Grid · Project Overlay.
+ * Same system as /any will use once Any's portfolio content exists.
+ */
+import Base from '../layouts/Base.astro';
+import PortfolioIntro from '../components/PortfolioIntro.astro';
+import PortfolioGrid from '../components/PortfolioGrid.astro';
+---
+
+<Base
+  title="TUNI"
+  description="Tuni's portfolio — video editing, motion graphics and visual design at KoolKatz Creative Studio."
+>
+  <main>
+    <PortfolioIntro personKey="tuni" name="Tuni" />
+    <PortfolioGrid owner="tuni" />
+  </main>
+</Base>

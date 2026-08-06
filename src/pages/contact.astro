@@ -1,0 +1,186 @@
+---
+/**
+ * CONTACT (BRIEF §12): WHO DO YOU WANT TO TALK TO? → TUNI / ANY / BOTH.
+ * Current version: designed mailto rows (addresses live centrally in
+ * src/data/site.ts). The future serverless + Resend form replaces the
+ * transport without redesigning this page (see src/server/README.md).
+ */
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+
+const { tuni, any } = site.contactEmails;
+
+const options = [
+  { label: 'Tuni', email: tuni, href: `mailto:${tuni}` },
+  { label: 'Any', email: any, href: `mailto:${any}` },
+  { label: 'Both', email: `${tuni} · ${any}`, href: `mailto:${tuni},${any}` },
+];
+---
+
+<Base title="CONTACT" description="Talk to Tuni, Any or both — KoolKatz Creative Studio.">
+  <main>
+    <section class="contact">
+      <div class="container">
+        <div class="contact-head" data-reveal>
+          <p class="kicker">Contact</p>
+          <h1 class="contact-question">
+            <span class="line">Who do you</span>
+            <span class="line line-2">want to talk to<span class="accent">?</span></span>
+          </h1>
+        </div>
+
+        <ul class="choices" data-reveal>
+          {
+            options.map((option, i) => (
+              <li>
+                <a class="choice" href={option.href}>
+                  <span class="choice-index">0{i + 1}</span>
+                  <span class="choice-name">{option.label}</span>
+                  <span class="choice-email">{option.email}</span>
+                  <span class="choice-arrow" aria-hidden="true">
+                    ↗
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="contact-note">
+          Whoever you pick, you'll get a real answer from a real person. Let's create.
+        </p>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .contact {
+    min-height: 92svh;
+    display: grid;
+    align-items: center;
+    background: var(--color-bg);
+    padding-block: clamp(7rem, 18vh, 10rem) clamp(4rem, 10vh, 6rem);
+  }
+
+  .contact-head {
+    margin-bottom: clamp(2.5rem, 7vh, 4.5rem);
+  }
+
+  .contact-question {
+    margin-top: 0.75rem;
+    font-family: var(--font-impact);
+    font-weight: 800;
+    font-size: clamp(2.1rem, 1.1rem + 5.5vw, 5.5rem);
+    line-height: 1.02;
+    text-transform: uppercase;
+    display: grid;
+  }
+
+  .contact-question .line {
+    display: block;
+  }
+
+  .contact-question .line-2 {
+    margin-left: clamp(1.5rem, 7vw, 6rem);
+  }
+
+  .accent {
+    color: var(--color-accent);
+  }
+
+  /* ---- The three choices: editorial rows, not generic buttons ---- */
+  .choices {
+    list-style: none;
+    padding: 0;
+    display: grid;
+  }
+
+  .choice {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      'index name arrow'
+      'index email arrow';
+    align-items: center;
+    column-gap: clamp(1rem, 3vw, 2.5rem);
+    padding-block: clamp(1.1rem, 3vh, 1.75rem);
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+    text-decoration: none;
+    transition: padding-left var(--duration-base) var(--ease-out);
+  }
+
+  .choices li:last-child .choice {
+    border-bottom: 1px solid rgb(255 255 255 / 0.12);
+  }
+
+  .choice-index {
+    grid-area: index;
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+  }
+
+  .choice-name {
+    grid-area: name;
+    font-family: var(--font-structure);
+    font-size: clamp(1.9rem, 1.2rem + 4vw, 4rem);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    line-height: 1.1;
+    transition: color var(--duration-base) var(--ease-out);
+  }
+
+  .choice-email {
+    grid-area: email;
+    font-size: var(--text-sm);
+    color: rgb(255 255 255 / 0.45);
+    transition:
+      color var(--duration-base) var(--ease-out),
+      opacity var(--duration-base) var(--ease-out);
+  }
+
+  .choice-arrow {
+    grid-area: arrow;
+    font-size: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+    color: var(--color-accent);
+    opacity: 0;
+    translate: -0.35rem 0.35rem;
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      translate var(--duration-base) var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .choice:hover {
+      padding-left: 0.75rem;
+    }
+    .choice:hover .choice-name,
+    .choice:focus-visible .choice-name {
+      color: var(--color-accent);
+    }
+    .choice:hover .choice-email {
+      color: rgb(255 255 255 / 0.7);
+    }
+    .choice:hover .choice-arrow,
+    .choice:focus-visible .choice-arrow {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  /* Touch: arrow always present as the affordance */
+  @media (hover: none) {
+    .choice-arrow {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  .contact-note {
+    margin-top: clamp(2rem, 6vh, 3.5rem);
+    font-family: var(--font-structure);
+    font-size: var(--text-lg);
+    color: rgb(255 255 255 / 0.7);
+    max-width: 30rem;
+  }
+</style>

@@ -1,0 +1,165 @@
+---
+/**
+ * Base layout: document skeleton, global styles, loader, header, footer.
+ */
+import '../styles/global.css';
+import { site } from '../data/site';
+import Loader from '../components/Loader.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} — ${site.name}` : site.name;
+---
+
+<!doctype html>
+<html lang={site.language}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <!-- Skip the loader on repeat visits before first paint -->
+    <script is:inline>
+      try {
+        if (sessionStorage.getItem('kk-loader-seen'))
+          document.documentElement.setAttribute('data-loader', 'skip');
+      } catch (e) {}
+      document.documentElement.classList.add('js');
+    </script>
+    <link rel="preload" href="/fonts/poppins-bold.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/mattone-regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/agrandir-grand-heavy.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- TODO: favicon derived from a cat icon — pending confirmation of which cat (PENDING_ASSETS.md) -->
+  </head>
+  <body>
+    <Loader />
+    <Header />
+    <slot />
+    <Footer />
+
+    <!-- Cursor halo: atmospheric glow, precise-pointer desktop only -->
+    <div id="kk-halo" aria-hidden="true"></div>
+
+    <style>
+      /* Cursor halo — never affects layout or input (pointer-events: none),
+         moves via the composited `translate` property only. */
+      #kk-halo {
+        --halo-core: 0.09;
+        --halo-mid: 0.035;
+        position: fixed;
+        top: -170px;
+        left: -170px;
+        width: 340px;
+        height: 340px;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 30;
+        background: radial-gradient(
+          circle,
+          rgb(245 151 172 / var(--halo-core)) 0%,
+          rgb(245 151 172 / var(--halo-mid)) 45%,
+          transparent 72%
+        );
+        opacity: 0;
+        transition:
+          opacity 0.5s var(--ease-out),
+          scale 0.4s var(--ease-out);
+        will-change: translate;
+      }
+
+      #kk-halo.is-on {
+        opacity: 1;
+      }
+
+      /* Gentle lift over interactive elements — glow, not spotlight */
+      #kk-halo.is-boost {
+        --halo-core: 0.15;
+        --halo-mid: 0.055;
+        scale: 1.25;
+      }
+    </style>
+
+    <script>
+      // Cursor halo: desktop precise pointers only; disabled entirely
+      // for touch devices and prefers-reduced-motion.
+      const halo = document.getElementById('kk-halo');
+      if (halo) {
+        const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+        const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!finePointer || reduced) {
+          halo.remove();
+        } else {
+          let targetX = 0;
+          let targetY = 0;
+          let x = 0;
+          let y = 0;
+          let raf = 0;
+
+          const follow = () => {
+            // soft trailing ease — atmospheric, not glued to the cursor
+            x += (targetX - x) * 0.14;
+            y += (targetY - y) * 0.14;
+            halo.style.translate = `${x}px ${y}px`;
+            if (Math.abs(targetX - x) > 0.5 || Math.abs(targetY - y) > 0.5) {
+              raf = requestAnimationFrame(follow);
+            } else {
+              raf = 0;
+            }
+          };
+
+          window.addEventListener(
+            'pointermove',
+            (e) => {
+              if (e.pointerType && e.pointerType !== 'mouse') return;
+              targetX = e.clientX;
+              targetY = e.clientY;
+              if (!halo.classList.contains('is-on')) {
+                // first appearance: snap into place, no fly-in from a corner
+                x = targetX;
+                y = targetY;
+                halo.style.translate = `${x}px ${y}px`;
+                halo.classList.add('is-on');
+              }
+              if (!raf) raf = requestAnimationFrame(follow);
+            },
+            { passive: true },
+          );
+
+          document.addEventListener('mouseover', (e) => {
+            const interactive = (e.target as HTMLElement).closest(
+              'a, button, [data-project], [data-side]',
+            );
+            halo.classList.toggle('is-boost', !!interactive);
+          });
+
+          document.documentElement.addEventListener('mouseleave', () => {
+            halo.classList.remove('is-on');
+          });
+        }
+      }
+
+      // Scroll reveal: sections fade up once, when they enter the viewport.
+      const revealEls = document.querySelectorAll('[data-reveal]');
+      if (revealEls.length) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-revealed');
+                io.unobserve(entry.target);
+              }
+            }
+          },
+          { threshold: 0.15 },
+        );
+        revealEls.forEach((el) => io.observe(el));
+      }
+    </script>
+  </body>
+</html>

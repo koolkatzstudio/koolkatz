@@ -1,0 +1,23 @@
+---
+/**
+ * HOME (BRIEF §3): Loader · Header · Hero · About/What We Do ·
+ * Portfolio Tuni + Portfolio Any (split collage) · Contact CTA · Footer.
+ * Loader/Header/Footer mount from the Base layout.
+ */
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import StudioIntro from '../components/StudioIntro.astro';
+import SplitPortfolios from '../components/SplitPortfolios.astro';
+import ContactCta from '../components/ContactCta.astro';
+---
+
+<Base
+  description="KoolKatz Creative Studio — brand identity, art direction, video editing, motion graphics and web design."
+>
+  <main>
+    <Hero />
+    <StudioIntro />
+    <SplitPortfolios />
+    <ContactCta />
+  </main>
+</Base>

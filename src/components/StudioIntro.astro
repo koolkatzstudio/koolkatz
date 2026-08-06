@@ -1,0 +1,122 @@
+---
+/**
+ * About / What We Do (BRIEF §7). A brief presentation + the services
+ * list — someone should quickly get what KoolKatz can do without the
+ * Home turning into a CV.
+ *
+ * COPY NOTE: the paragraph is adapted (ES→EN) from BRAND.md §1.
+ * Final About copy is still pending (PENDING_ASSETS.md).
+ */
+import { site } from '../data/site';
+---
+
+<section class="studio" id="about">
+  <div class="container studio-grid" data-reveal>
+    <div class="studio-text">
+      <p class="kicker">What we do</p>
+      <p class="statement">
+        KoolKatz is a creative studio specialized in visual identity, art direction,
+        motion graphics, video editing and web design. We don't impose a style —
+        we uncover the essence of each brand and translate it into visual systems
+        that are memorable, coherent and functional.
+      </p>
+    </div>
+
+    <ul class="services" role="list">
+      {
+        site.services.map((service, i) => (
+          <li>
+            <span class="service-index">0{i + 1}</span>
+            <span class="service-name">{service}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .studio {
+    background: var(--color-black);
+    padding-block: clamp(5rem, 14vh, 9rem);
+  }
+
+  .studio-grid {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .studio-text {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 42rem;
+  }
+
+  .statement {
+    font-size: var(--text-lg);
+    line-height: 1.5;
+  }
+
+  .services {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0;
+  }
+
+  .services li {
+    display: flex;
+    align-items: baseline;
+    gap: 1.25rem;
+    padding-block: clamp(0.8rem, 2vh, 1.1rem);
+    border-top: 1px solid rgb(255 255 255 / 0.1);
+    transition: padding-left var(--duration-base) var(--ease-out);
+  }
+
+  .services li:last-child {
+    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+  }
+
+  @media (hover: hover) {
+    .services li:hover {
+      padding-left: 0.75rem;
+    }
+    .services li:hover .service-name {
+      color: var(--color-accent);
+    }
+  }
+
+  .service-index {
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+  }
+
+  .service-name {
+    font-family: var(--font-structure);
+    font-size: clamp(1.1rem, 1rem + 1.2vw, 1.9rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: color var(--duration-base) var(--ease-out);
+  }
+
+  /* Mobile: tighter vertical rhythm */
+  @media (max-width: 48rem) {
+    .studio {
+      padding-block: clamp(4rem, 10vh, 6rem);
+    }
+    .studio-grid {
+      gap: 2.25rem;
+    }
+  }
+
+  /* Desktop: asymmetric two-column editorial layout */
+  @media (min-width: 60rem) {
+    .studio-grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 4fr);
+      align-items: start;
+    }
+    .services {
+      margin-top: 3rem; /* offset — the grid exists, it just isn't rigid */
+    }
+  }
+</style>

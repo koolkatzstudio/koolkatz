@@ -1,0 +1,466 @@
+---
+/**
+ * Portfolio grid + filters (BRIEF §9/§10).
+ * Cards: B/W + very light blur → hover: color + focus + scale ~1.02.
+ * Touch: scroll-based reveal (viewport center band) + direct tap to open.
+ * Filters: All + the 7 categories; a project can belong to several;
+ * active filter reflected in the URL (?f=); mobile filters scroll
+ * horizontally. Tap/click opens the ProjectOverlay.
+ *
+ * NO projects are invented: when the collection has no projects for
+ * this owner, the grid renders clearly-labeled placeholder cards for
+ * layout testing only.
+ */
+import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
+import ProjectOverlay from './ProjectOverlay.astro';
+import { CATEGORY_LABELS, CATEGORY_SLUGS } from '../data/categories';
+
+interface Props {
+  owner: 'tuni' | 'any';
+}
+
+const { owner } = Astro.props;
+
+type MediaItem =
+  | { type: 'image'; src: string; alt: string }
+  | { type: 'video'; src: string; poster?: string; caption?: string }
+  | { type: 'youtube'; id: string; vertical: boolean; caption?: string }
+  | { type: 'pdf'; src: string; label?: string }
+  | { type: 'ph' };
+
+/** YouTube URL (watch / youtu.be / shorts / embed) → embed info.
+    Shorts render vertical (9:16), standard videos 16:9. */
+function youTubeInfo(src: string): { id: string; vertical: boolean } | null {
+  const m = src.match(/(?:youtu\.be\/|youtube\.com\/(?:shorts\/|watch\?v=|embed\/))([\w-]{6,})/);
+  return m ? { id: m[1], vertical: src.includes('/shorts/') } : null;
+}
+
+interface CardData {
+  slug: string;
+  title: string;
+  categories: string[];
+  year: number | null;
+  kind?: 'client' | 'personal' | 'academic';
+  client?: string;
+  role?: string;
+  tools: string[];
+  about: string;
+  isPlaceholder: boolean;
+  cover?: { src: string; alt: string };
+  media: MediaItem[];
+}
+
+const all = await getCollection('projects');
+const own = all
+  .filter((p) => p.data.owner === owner || p.data.owner === 'both')
+  .sort((a, b) => a.data.order - b.data.order);
+
+let cards: CardData[];
+
+if (own.length) {
+  cards = await Promise.all(
+    own.map(async (p) => {
+      const cover = await getImage({ src: p.data.cover, widths: [600, 900], format: 'webp' });
+      const media: MediaItem[] = await Promise.all(
+        p.data.media.map(async (m) => {
+          if (m.type === 'image') {
+            const img = await getImage({ src: m.src, widths: [1400], format: 'webp' });
+            return { type: 'image' as const, src: img.src, alt: m.alt };
+          }
+          if (m.type === 'pdf') {
+            return { type: 'pdf' as const, src: m.src, label: m.label };
+          }
+          const yt = youTubeInfo(m.src);
+          if (yt) {
+            return { type: 'youtube' as const, ...yt, caption: m.caption };
+          }
+          const poster = m.poster
+            ? (await getImage({ src: m.poster, widths: [1400], format: 'webp' })).src
+            : undefined;
+          return { type: 'video' as const, src: m.src, poster, caption: m.caption };
+        }),
+      );
+      return {
+        slug: p.id.replace(/\//g, '-'),
+        title: p.data.title,
+        categories: p.data.categories,
+        year: p.data.year ?? null,
+        kind: p.data.kind,
+        client: p.data.client,
+        role: p.data.role,
+        tools: p.data.tools,
+        /* About sections still holding placeholder copy are hidden */
+        about: /\[PLACEHOLDER/i.test(p.body ?? '') ? '' : (p.body ?? ''),
+        isPlaceholder: false,
+        cover: { src: cover.src, alt: p.data.coverAlt },
+        media,
+      };
+    }),
+  );
+} else {
+  /* Layout-testing placeholders — clearly identified, never real content.
+     Categories cycle so every filter can be exercised. */
+  const cycle: string[][] = [
+    ['motion-graphics', 'branding'],
+    ['video-editing'],
+    ['visual-design', 'experimental'],
+    ['social-content'],
+    ['web-digital', 'branding'],
+    ['experimental'],
+    ['motion-graphics', 'video-editing'],
+    ['branding'],
+    ['social-content', 'visual-design'],
+  ];
+  const kinds = ['client', 'personal', 'academic'] as const;
+  cards = cycle.map((categories, i) => ({
+    slug: `placeholder-${String(i + 1).padStart(2, '0')}`,
+    title: `Placeholder Project ${String(i + 1).padStart(2, '0')}`,
+    categories,
+    year: null,
+    kind: kinds[i % 3],
+    role: '[Placeholder — role]',
+    tools: [],
+    about:
+      'Placeholder project used only to test the portfolio layout, filters and overlay. Real projects are pending — see PENDING_ASSETS.md.',
+    isPlaceholder: true,
+    media: Array.from({ length: 2 + (i % 3) }, () => ({ type: 'ph' as const })),
+  }));
+}
+
+const showingPlaceholders = !own.length;
+
+/* Editorial span/aspect pattern (12-col desktop grid) */
+const pattern = [
+  { span: 7, ar: '16 / 10' },
+  { span: 5, ar: '4 / 3' },
+  { span: 5, ar: '1 / 1' },
+  { span: 7, ar: '16 / 10' },
+  { span: 4, ar: '4 / 5' },
+  { span: 4, ar: '4 / 5' },
+  { span: 4, ar: '4 / 5' },
+  { span: 7, ar: '16 / 10' },
+  { span: 5, ar: '4 / 3' },
+];
+
+const dataJson = JSON.stringify(Object.fromEntries(cards.map((c) => [c.slug, c]))).replace(
+  /</g,
+  '\\u003c',
+);
+---
+
+<section class="portfolio" aria-label="Projects">
+  <div class="container">
+    <div class="filters-wrap">
+      <div class="filters" role="toolbar" aria-label="Filter projects by category">
+        <button class="filter" data-filter="all" aria-pressed="true">All</button>
+        {
+          CATEGORY_SLUGS.map((slug) => (
+            <button class="filter" data-filter={slug} aria-pressed="false">
+              {CATEGORY_LABELS[slug]}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    {
+      showingPlaceholders && (
+        <p class="ph-note">
+          Showing placeholder cards — layout testing only. Real projects pending
+          (PENDING_ASSETS.md).
+        </p>
+      )
+    }
+
+    <p class="sr-only" role="status" id="kk-filter-status"></p>
+
+    <ul class="grid" id="kk-grid">
+      {
+        cards.map((card, i) => {
+          const p = pattern[i % pattern.length];
+          return (
+            <li style={`--span: ${p.span}; --ar: ${p.ar}`}>
+              <button
+                class="card"
+                data-project={card.slug}
+                data-categories={card.categories.join(' ')}
+                aria-haspopup="dialog"
+              >
+                <span class="thumb">
+                  {card.cover ? (
+                    <img src={card.cover.src} alt={card.cover.alt} loading="lazy" />
+                  ) : (
+                    <span class="thumb-ph" aria-hidden="true">
+                      <span class="ph-badge">Placeholder</span>
+                    </span>
+                  )}
+                </span>
+                <span class="card-meta">
+                  <span class="card-title">{card.title}</span>
+                  <span class="card-sub">
+                    {card.categories.map((c) => CATEGORY_LABELS[c]).join(' · ')} ·{' '}
+                    {card.year ?? 'Year TBD'}
+                  </span>
+                </span>
+              </button>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</section>
+
+<ProjectOverlay />
+
+<script type="application/json" id="kk-projects-data" set:html={dataJson} />
+
+<style>
+  .portfolio {
+    background: var(--color-bg);
+    padding-block: clamp(1.5rem, 5vh, 3rem) clamp(5rem, 14vh, 9rem);
+  }
+
+  /* ---- Filters ---- */
+  .filters-wrap {
+    border-block: 1px solid rgb(255 255 255 / 0.1);
+    margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+  }
+
+  .filters {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    padding-block: 0.4rem;
+  }
+
+  .filter {
+    font-family: var(--font-structure);
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.65);
+    padding: 0 0.9rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    transition: color var(--duration-base) var(--ease-out);
+  }
+
+  .filter:hover {
+    color: var(--color-white);
+  }
+
+  .filter[aria-pressed='true'] {
+    color: var(--color-accent);
+  }
+
+  /* Mobile: one horizontal scrolling row, no wrap */
+  @media (max-width: 48rem) {
+    .filters {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+      /* bleed to the viewport edge so the row hints at more content */
+      margin-inline: calc(-1 * clamp(1.25rem, 4vw, 3.5rem));
+      padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+    }
+    .filters::-webkit-scrollbar {
+      display: none;
+    }
+    .filter {
+      scroll-snap-align: start;
+    }
+  }
+
+  .ph-note {
+    font-size: var(--text-sm);
+    color: rgb(255 255 255 / 0.45);
+    border: 1px dashed rgb(255 255 255 / 0.2);
+    padding: 0.75rem 1rem;
+    margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+  }
+
+  /* ---- Grid ---- */
+  .grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: clamp(1rem, 2.5vw, 2rem);
+    transition: opacity 0.18s var(--ease-out);
+  }
+
+  .grid.is-filtering {
+    opacity: 0;
+  }
+
+  .grid li[hidden] {
+    display: none;
+  }
+
+  .card {
+    display: grid;
+    gap: 0.7rem;
+    width: 100%;
+    text-align: left;
+    padding: 0;
+  }
+
+  .thumb {
+    display: block;
+    aspect-ratio: var(--ar, 4 / 3);
+    overflow: hidden;
+    background: #101010;
+    filter: var(--treatment-grid);
+    scale: 1;
+    transition:
+      filter 0.35s var(--ease-out),
+      scale 0.35s var(--ease-out);
+  }
+
+  .thumb :global(img),
+  .thumb-ph {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .thumb-ph {
+    display: grid;
+    place-items: center;
+    background: linear-gradient(155deg, #1f1f1f 0%, #181818 60%, #1c191b 100%);
+  }
+
+  .ph-badge {
+    font-family: var(--font-structure);
+    font-size: 0.5625rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.3);
+    border: 1px dashed rgb(255 255 255 / 0.22);
+    padding: 0.45rem 0.7rem;
+  }
+
+  /* Card info: invitation, not clutter (BRIEF §10) */
+  .card-meta {
+    display: grid;
+    gap: 0.1rem;
+    opacity: 0;
+    translate: 0 0.35rem;
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      translate var(--duration-base) var(--ease-out);
+  }
+
+  .card-title {
+    font-family: var(--font-structure);
+    font-size: var(--text-sm);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .card-sub {
+    font-size: 0.75rem;
+    color: rgb(255 255 255 / 0.55);
+  }
+
+  /* ---- Desktop hover: color + focus + slight scale ---- */
+  @media (hover: hover) {
+    .card:hover .thumb,
+    .card:focus-visible .thumb {
+      filter: var(--treatment-revealed);
+      scale: var(--scale-hover);
+    }
+    .card:hover .card-meta,
+    .card:focus-visible .card-meta {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  /* ---- Touch: scroll-based reveal, tap opens directly ---- */
+  @media (hover: none) {
+    .card.is-inview .thumb {
+      filter: var(--treatment-revealed);
+      scale: var(--scale-hover);
+    }
+    .card.is-inview .card-meta {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  /* ---- Responsive grid: 1 col → 2 cols → 12-col editorial ---- */
+  @media (min-width: 35rem) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 56.25rem) {
+    .grid {
+      grid-template-columns: repeat(12, 1fr);
+      align-items: start;
+    }
+    .grid li {
+      grid-column: span var(--span, 6);
+    }
+  }
+</style>
+
+<script>
+  // ---------- Filters (multi-category, URL-synced) ----------
+  const grid = document.getElementById('kk-grid');
+  const status = document.getElementById('kk-filter-status');
+  const filterBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('.filter'));
+
+  function applyFilter(slug: string, updateUrl = true) {
+    if (!grid) return;
+    let shown = 0;
+    for (const btn of filterBtns) {
+      btn.setAttribute('aria-pressed', String(btn.dataset.filter === slug));
+    }
+    grid.classList.add('is-filtering');
+    setTimeout(() => {
+      grid.querySelectorAll<HTMLElement>('.card').forEach((card) => {
+        const cats = (card.dataset.categories ?? '').split(' ');
+        const match = slug === 'all' || cats.includes(slug);
+        card.closest('li')!.hidden = !match;
+        if (match) shown++;
+      });
+      grid.classList.remove('is-filtering');
+      if (status) status.textContent = `${shown} project${shown === 1 ? '' : 's'} shown`;
+    }, 180);
+    if (updateUrl) {
+      const url = new URL(location.href);
+      if (slug === 'all') url.searchParams.delete('f');
+      else url.searchParams.set('f', slug);
+      history.replaceState(history.state, '', url);
+    }
+  }
+
+  filterBtns.forEach((btn) =>
+    btn.addEventListener('click', () => applyFilter(btn.dataset.filter ?? 'all')),
+  );
+
+  const initial = new URL(location.href).searchParams.get('f');
+  if (initial && filterBtns.some((b) => b.dataset.filter === initial)) {
+    applyFilter(initial, false);
+  }
+
+  // ---------- Touch: reveal cards in the viewport's center band ----------
+  if (matchMedia('(hover: none)').matches) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          entry.target.classList.toggle('is-inview', entry.isIntersecting);
+        }
+      },
+      { rootMargin: '-25% 0px -25% 0px' },
+    );
+    document.querySelectorAll('.card').forEach((card) => io.observe(card));
+  }
+</script>
