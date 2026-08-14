@@ -10,7 +10,7 @@ media:
   - { type: image, src: ./2.png, alt: 'Mockups — image 2' }
   - { type: image, src: ./3.png, alt: 'Mockups — image 3' }
   - { type: video, src: 'https://youtu.be/5UzxmFvtwPE' }
-  - { type: video, src: 'https://youtu.be/2xfJ3BdDSWY' }
+  - { type: video, src: 'https://youtube.com/shorts/12MhN1cCRPc?feature=share' }
 order: 9
 ---
 
