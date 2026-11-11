@@ -278,8 +278,129 @@
     const mediaBox = document.getElementById('kk-overlay-media')!;
     const closeBtn = document.getElementById('kk-overlay-close')!;
 
+    type YouTubePlayer = {
+      getPlayerState: () => number;
+      pauseVideo: () => void;
+      stopVideo: () => void;
+    };
+    type YouTubePlayerEvent = { data: number; target: YouTubePlayer };
+    type YouTubeApi = {
+      PlayerState: { PLAYING: number };
+      Player: new (
+        iframe: HTMLIFrameElement,
+        options: {
+          events: {
+            onReady: (event: { target: YouTubePlayer }) => void;
+            onStateChange: (event: YouTubePlayerEvent) => void;
+          };
+        },
+      ) => YouTubePlayer;
+    };
+    type YouTubeWindow = Window & {
+      YT?: YouTubeApi;
+      onYouTubeIframeAPIReady?: () => void;
+    };
+
     let openedFromDeepLink = false;
     let cleaned = true; // nothing open initially
+    let activeYouTubePlayer: YouTubePlayer | null = null;
+    let youtubeApiPromise: Promise<YouTubeApi> | undefined;
+    const youtubePlayers = new Map<HTMLIFrameElement, YouTubePlayer>();
+
+    function loadYouTubeApi(): Promise<YouTubeApi> {
+      const ytWindow = window as YouTubeWindow;
+      if (ytWindow.YT?.Player) return Promise.resolve(ytWindow.YT);
+      if (youtubeApiPromise) return youtubeApiPromise;
+
+      youtubeApiPromise = new Promise((resolve, reject) => {
+        const previousCallback = ytWindow.onYouTubeIframeAPIReady;
+        ytWindow.onYouTubeIframeAPIReady = () => {
+          const api = ytWindow.YT;
+          if (!api?.Player) {
+            reject(new Error('The YouTube IFrame Player API did not initialize.'));
+            return;
+          }
+          resolve(api);
+          previousCallback?.();
+        };
+
+        let script = document.querySelector<HTMLScriptElement>(
+          'script[src="https://www.youtube.com/iframe_api"]',
+        );
+        if (!script) {
+          script = document.createElement('script');
+          script.src = 'https://www.youtube.com/iframe_api';
+        }
+        script.addEventListener(
+          'error',
+          () => reject(new Error('Failed to load the YouTube IFrame Player API.')),
+          { once: true },
+        );
+        if (!script.isConnected) document.head.append(script);
+      }).catch((error: unknown) => {
+        youtubeApiPromise = undefined;
+        throw error;
+      });
+
+      return youtubeApiPromise;
+    }
+
+    function updateActivePlayer(
+      player: YouTubePlayer,
+      state: number,
+      playingState: number,
+    ) {
+      if (state === playingState) {
+        const previousPlayer = activeYouTubePlayer;
+        activeYouTubePlayer = player;
+        if (previousPlayer && previousPlayer !== player) previousPlayer.pauseVideo();
+      } else if (activeYouTubePlayer === player) {
+        activeYouTubePlayer = null;
+      }
+    }
+
+    function trackYouTubePlayer(frame: HTMLIFrameElement) {
+      loadYouTubeApi()
+        .then((api) => {
+          if (
+            !mediaBox.contains(frame) ||
+            !frame.src.includes('youtube-nocookie.com/embed/') ||
+            youtubePlayers.has(frame)
+          ) {
+            return;
+          }
+          const handleState = (player: YouTubePlayer, state: number) => {
+            if (frame.src === 'about:blank') return;
+            updateActivePlayer(player, state, api.PlayerState.PLAYING);
+          };
+          const player = new api.Player(frame, {
+            events: {
+              onReady: ({ target }) => handleState(target, target.getPlayerState()),
+              onStateChange: ({ data, target }) => handleState(target, data),
+            },
+          });
+          youtubePlayers.set(frame, player);
+        })
+        .catch((error: unknown) => {
+          console.error('Unable to initialize the YouTube player API.', error);
+        });
+    }
+
+    function stopYouTubeVideos() {
+      mediaBox
+        .querySelectorAll<HTMLIFrameElement>(
+          'iframe[src*="youtube.com"], iframe[src*="youtube-nocookie.com"], iframe[src*="youtu.be"]',
+        )
+        .forEach((frame) => {
+          const player = youtubePlayers.get(frame);
+          if (player) {
+            if (activeYouTubePlayer === player) activeYouTubePlayer = null;
+            player.stopVideo();
+            youtubePlayers.delete(frame);
+          }
+          frame.src = 'about:blank';
+        });
+    }
 
     /* Cleanup runs explicitly from every close path (button, Esc,
        backdrop, back button) instead of relying on the dialog 'close'
@@ -288,6 +409,7 @@
     function cleanup(viaPop: boolean) {
       if (cleaned) return;
       cleaned = true;
+      stopYouTubeVideos();
       document.documentElement.classList.remove('kk-overlay-open');
       if (!viaPop) {
         if (openedFromDeepLink) {
@@ -335,6 +457,7 @@
         about.append(el);
       }
 
+      stopYouTubeVideos();
       mediaBox.replaceChildren();
       for (const m of p.media ?? []) {
         if (m.type === 'image') {
@@ -372,7 +495,7 @@
           const fig = document.createElement('figure');
           if (m.vertical) fig.className = 'ov-yt-vertical';
           const frame = document.createElement('iframe');
-          frame.src = `https://www.youtube-nocookie.com/embed/${m.id}`;
+          frame.src = `https://www.youtube-nocookie.com/embed/${m.id}?enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
           frame.allow =
             'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
           frame.allowFullscreen = true;
@@ -385,6 +508,7 @@
             fig.append(cap);
           }
           mediaBox.append(fig);
+          trackYouTubePlayer(frame);
         } else if (m.type === 'pdf') {
           const link = document.createElement('a');
           link.className = 'ov-pdf';
