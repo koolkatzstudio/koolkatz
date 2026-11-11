@@ -1,6 +1,6 @@
 ---
 title: 'Reels — Yentigroup'
-owner: tuni
+owner: any
 categories: [social-content, video-editing]
 cover: ./cover.jpeg
 coverAlt: 'Reels Yentigroup — cover'
